@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HoopIQ</title>
+    <meta
+      name="description"
+      content="HoopIQ basketball training dashboard for progress tracking, drills, game IQ, and player-inspired lessons."
+    />
+    <meta name="theme-color" content="#f5f5f2" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="design-system.css" />
+    <script>
+      try {
+        const savedTheme = localStorage.getItem('hoopIQ-theme');
+        if (savedTheme === 'light' || savedTheme === 'dark') {
+          document.documentElement.dataset.theme = savedTheme;
+        }
+      } catch (error) {
+        console.error('Unable to load the saved HoopIQ color theme.', error);
+      }
+    </script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-wrap">
+          <div class="brand-mark">H</div>
+          <div>
+            <p class="eyebrow">Training Zone</p>
+            <h1>HoopIQ</h1>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Main navigation">
+          <button class="nav-item active" type="button" data-view="dashboard">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" /></svg>
+            <span>Dashboard</span>
+          </button>
+          <button class="nav-item" type="button" data-view="progress">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17" /><path d="m7 15 4-4 3 2 6-7" /></svg>
+            <span>My Progress</span>
+          </button>
+          <button class="nav-item" type="button" data-view="coach">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /><path d="M8 8h.01M16 8h.01" /></svg>
+            <span>Personal Coach</span>
+          </button>
+          <button class="nav-item" type="button" data-view="iq">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1" /></svg>
+            <span>Basketball IQ</span>
+          </button>
+          <button class="nav-item" type="button" data-view="academy">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m2 8 10-5 10 5-10 5z" /><path d="M6 10v5c3 3 9 3 12 0v-5" /><path d="M22 8v6" /></svg>
+            <span>NBA Academy</span>
+          </button>
+        </nav>
+
+        <div class="mini-card">
+          <p class="mini-label">Today</p>
+          <div class="mini-score-row">
+            <strong id="todayMinutes">0</strong>
+            <span>mins</span>
+          </div>
+          <p class="mini-note" id="miniNoteText">No workouts logged yet</p>
+        </div>
+      </aside>
+
+      <nav class="mobile-nav" aria-label="Mobile navigation">
+        <button class="nav-item mobile-nav-item active" type="button" data-view="dashboard" aria-label="Dashboard">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" /></svg>
+          <span>Home</span>
+        </button>
+        <button class="nav-item mobile-nav-item" type="button" data-view="progress" aria-label="My Progress">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17" /><path d="m7 15 4-4 3 2 6-7" /></svg>
+          <span>Progress</span>
+        </button>
+        <button class="nav-item mobile-nav-item" type="button" data-view="coach" aria-label="Personal Coach">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /><path d="M8 8h.01M16 8h.01" /></svg>
+          <span>Coach</span>
+        </button>
+        <button class="nav-item mobile-nav-item" type="button" data-view="iq" aria-label="Basketball IQ">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1" /></svg>
+          <span>Game IQ</span>
+        </button>
+        <button class="nav-item mobile-nav-item" type="button" data-view="academy" aria-label="NBA Academy">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m2 8 10-5 10 5-10 5z" /><path d="M6 10v5c3 3 9 3 12 0v-5" /><path d="M22 8v6" /></svg>
+          <span>Academy</span>
+        </button>
+      </nav>
+
+      <main class="main-panel">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow subtle">Player profile</p>
+            <h2 id="pageTitle">Dashboard</h2>
+          </div>
+          <div class="topbar-actions">
+            <button class="icon-btn" id="themeToggleBtn" type="button" aria-label="Switch to dark mode" title="Switch to dark mode">
+              <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42" /></svg>
+              <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.5A8.6 8.6 0 0 1 8.5 3.8 8.7 8.7 0 1 0 20.2 15.5Z" /></svg>
+            </button>
+            <button class="icon-btn" id="settingsBtn" type="button" aria-label="Open settings" title="Settings">
+              <svg class="settings-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" /><path d="m19.4 15 .1.1a1.7 1.7 0 0 1-2.4 2.4l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.2a1.7 1.7 0 0 1-3.4 0v-.2a1.7 1.7 0 0 0-2.9-1.2l-.1.1a1.7 1.7 0 1 1-2.4-2.4l.1-.1a1.7 1.7 0 0 0-1.2-2.9H4a1.7 1.7 0 0 1 0-3.4h.2a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a1.7 1.7 0 1 1 2.4-2.4l.1.1a1.7 1.7 0 0 0 2.9-1.2V2a1.7 1.7 0 0 1 3.4 0v.2a1.7 1.7 0 0 0 2.9 1.2l.1-.1a1.7 1.7 0 0 1 2.4 2.4l-.1.1a1.7 1.7 0 0 0 1.2 2.9h.2a1.7 1.7 0 0 1 0 3.4h-.2a1.7 1.7 0 0 0-1.2 2.9Z" /></svg>
+              <svg class="settings-exit-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+            </button>
+            <button class="ghost-btn" id="resetProgressBtn">Reset progress</button>
+            <button class="primary-btn" id="quickWorkoutBtn">Log workout</button>
+          </div>
+        </header>
+        <p class="global-status" id="globalStatus" aria-live="polite"></p>
+
+        <section id="view-dashboard" class="view active">
+          <div class="hero-card">
+            <div>
+              <p class="eyebrow">Welcome back</p>
+              <h3>Build your game one rep at a time.</h3>
+              <p>
+                Your latest work has been strong, and today is a great day to lock in your shooting rhythm and decision-making.
+              </p>
+              <div class="hero-actions">
+                <button class="primary-btn" data-view="coach">Start drill</button>
+                <button class="secondary-btn" data-view="progress">Review progress</button>
+              </div>
+            </div>
+            <div class="hero-metrics">
+              <div class="metric-box accent">
+                <span>Season shot %</span>
+                <strong id="seasonShootingPct">0%</strong>
+              </div>
+              <div class="metric-box">
+                <span>Sessions</span>
+                <strong id="sessionsCount">0</strong>
+              </div>
+              <div class="metric-box">
+                <span>Total makes</span>
+                <strong id="prValue">0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <article class="card">
+              <div class="card-head">
+                <h4>Training summary</h4>
+                <span class="pill" id="trainingStatusPill">Ready to start</span>
+              </div>
+              <ul class="summary-list">
+                <li>
+                  <span>Shooting self-rating</span>
+                  <strong id="shotFormMetric">Not rated</strong>
+                </li>
+                <li>
+                  <span>Ball handling self-rating</span>
+                  <strong id="ballHandlingMetric">Not rated</strong>
+                </li>
+                <li>
+                  <span>Game IQ self-rating</span>
+                  <strong id="gameIQMetric">Not rated</strong>
+                </li>
+                <li>
+                  <span>Finishing self-rating</span>
+                  <strong id="finishingMetric">Not rated</strong>
+                </li>
+                <li>
+                  <span>Defense self-rating</span>
+                  <strong id="defenseMetric">Not rated</strong>
+                </li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <div class="card-head">
+                <h4>Progress overview</h4>
+                <span class="pill">Season</span>
+              </div>
+              <div class="progress-ring-wrap">
+                <div class="progress-ring">
+                  <svg viewBox="0 0 120 120" aria-hidden="true">
+                    <circle cx="60" cy="60" r="48"></circle>
+                    <circle cx="60" cy="60" r="48" class="ring-progress"></circle>
+                  </svg>
+                  <div class="ring-center">
+                    <strong id="progressPercent">76%</strong>
+                  </div>
+                </div>
+                <p id="improvementTrendText">Improvement trend 0% from last month.</p>
+              </div>
+            </article>
+
+            <article class="card wide-card">
+              <div class="card-head">
+                <h4>Recommended focus</h4>
+                <span class="pill warning" id="recommendedFocusPill">Build a training baseline</span>
+              </div>
+              <div class="focus-box">
+                <div>
+                  <p class="focus-title" id="dashboardFocusTitle">Your next step starts with a session</p>
+                  <small id="dashboardFocusReason">Log a workout to unlock personalized, data-based training suggestions.</small>
+                </div>
+                <button class="tiny-btn" data-view="iq">Learn play</button>
+              </div>
+            </article>
+          </div>
+          <div class="card motivation-card">
+            <div>
+              <p class="eyebrow subtle">Built by showing up</p>
+              <h4>Training momentum</h4>
+              <p id="motivationSummary">Complete a workout to earn XP and start your streak.</p>
+            </div>
+            <div class="motivation-stats">
+              <div><strong id="xpTotal">0</strong><span>XP</span></div>
+              <div><strong id="streakCount">0</strong><span>day streak</span></div>
+              <div><strong id="weeklyChallengeCount">0/3</strong><span>weekly sessions</span></div>
+            </div>
+          </div>
+          <div class="card achievement-card">
+            <div class="card-head">
+              <h4>Achievements</h4>
+              <span class="pill">Earned through practice</span>
+            </div>
+            <div id="achievementSummary" class="achievement-summary"></div>
+          </div>
+        </section>
+
+        <section id="view-progress" class="view">
+          <div class="section-grid">
+            <article class="card">
+              <div class="card-head">
+                <h4>Shooting percentages</h4>
+                <span class="pill">Last 14 days</span>
+              </div>
+              <div class="bar-group">
+                <div class="bar-row">
+                  <label>Three-pointers</label>
+                  <div class="bar"><span id="catchShootBar" style="width: 0%"></span></div>
+                  <strong id="catchShootPct">0%</strong>
+                </div>
+                <div class="bar-row">
+                  <label>Mid-range</label>
+                  <div class="bar"><span id="midRangeBar" style="width: 0%"></span></div>
+                  <strong id="midRangePct">0%</strong>
+                </div>
+                <div class="bar-row">
+                  <label>Free throws</label>
+                  <div class="bar"><span id="pullUpBar" style="width: 0%"></span></div>
+                  <strong id="pullUpPct">0%</strong>
+                </div>
+                <div class="bar-row">
+                  <label>Layups</label>
+                  <div class="bar"><span id="layupBar" style="width: 0%"></span></div>
+                  <strong id="layupPct">0%</strong>
+                </div>
+              </div>
+            </article>
+
+            <article class="card">
+              <div class="card-head">
+                <h4>Practice sessions</h4>
+                <span class="pill">Live stats</span>
+              </div>
+              <ul class="session-list">
+                <li><span>Made shots</span><strong id="madeShotsStat">0</strong></li>
+                <li><span>Attempts</span><strong id="attemptsStat">0</strong></li>
+                <li><span>Session time</span><strong id="sessionMinutesStat">0 min</strong></li>
+                <li><span>Sessions logged</span><strong id="sessionsLoggedStat">0</strong></li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <div class="card-head">
+                <h4>Personal records</h4>
+                <span class="pill accent">Best</span>
+              </div>
+              <ul class="record-list">
+                <li><span>Most makes in a session</span><strong id="consecutiveMakesStat">0</strong></li>
+                <li><span>Best three-point session</span><strong id="threePointStreakStat">—</strong></li>
+                <li><span>Defense sessions</span><strong id="defensiveStopsStat">0</strong></li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <div class="card-head">
+                <h4>Weaknesses</h4>
+                <span class="pill warning">Needs work</span>
+              </div>
+              <ul class="weakness-list">
+                <li><span>Close-out timing</span><strong id="closeoutWeakness">0%</strong></li>
+                <li><span>Rim finishing</span><strong id="rimFinishingWeakness">0%</strong></li>
+                <li><span>Late shot selection</span><strong id="lateShotWeakness">0%</strong></li>
+              </ul>
+            </article>
+
+            <article class="card wide-card">
+              <div class="card-head">
+                <h4>Log a shooting session</h4>
+                <span class="pill accent">Manual input</span>
+              </div>
+              <form id="workoutForm" class="input-form">
+                <div class="form-grid">
+                  <label>
+                    Made shots
+                    <input type="number" id="madeShotsInput" min="0" value="0" />
+                  </label>
+                  <label>
+                    Total attempts
+                    <input type="number" id="attemptsInput" min="0" value="0" />
+                  </label>
+                  <label>
+                    Minutes
+                    <input type="number" id="minutesInput" min="0" max="180" value="0" />
+                  </label>
+                  <label>
+                    Shot category
+                    <select id="shotTypeInput">
+                      <option value="freeThrow">Free throws</option>
+                      <option value="layup">Layups</option>
+                      <option value="midrange">Midrange</option>
+                      <option value="threePointer">Three-pointers</option>
+                    </select>
+                  </label>
+                  <label>
+                    Drill name
+                    <input
+                      type="search"
+                      id="drillInput"
+                      list="knownDrills"
+                      placeholder="Search or type a drill name"
+                      autocomplete="off"
+                      aria-describedby="drillHelp drillFeedback"
+                      required
+                    />
+                    <datalist id="knownDrills"></datalist>
+                    <small id="drillHelp" class="form-hint">Choose a suggestion or type a known drill. Capitalization and extra spaces are okay.</small>
+                    <small id="drillFeedback" class="drill-feedback" aria-live="polite"></small>
+                  </label>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="primary-btn">Save session</button>
+                  <button type="button" class="ghost-btn" id="addSampleSessionBtn">Clear form</button>
+                </div>
+              </form>
+            </article>
+          </div>
+          <div class="section-grid progress-tools">
+            <article class="card court-card">
+              <div class="card-head">
+                <div>
+                  <h4>Shot chart</h4>
+                  <p class="card-subtitle">Choose a court zone, then record the result.</p>
+                </div>
+                <label class="compact-select-label" for="chartShotType">Shot type</label>
+                <select id="chartShotType" class="compact-select">
+                  <option value="freeThrow">Free throw</option>
+                  <option value="layup">Layup</option>
+                  <option value="midrange">Midrange</option>
+                  <option value="threePointer">Three-pointer</option>
+                </select>
+              </div>
+              <svg class="shot-court" viewBox="0 0 320 220" role="group" aria-label="Interactive half-court shot chart">
+                <rect class="court-floor" x="10" y="10" width="300" height="200" rx="8" />
+                <path class="court-line" d="M10 28h300M110 210v-65a50 50 0 0 1 100 0v65M132 210v-45a28 28 0 0 1 56 0v45M145 28a15 15 0 1 0 30 0" />
+                <path class="court-line" d="M45 28a115 115 0 0 0 230 0" />
+                <circle class="court-hoop" cx="160" cy="31" r="7" />
+                <g class="court-zone" role="button" tabindex="0" aria-label="Left corner" data-zone="Left corner"><circle cx="33" cy="68" r="13" /><text x="33" y="72">1</text></g>
+                <g class="court-zone" role="button" tabindex="0" aria-label="Left wing" data-zone="Left wing"><circle cx="80" cy="92" r="13" /><text x="80" y="96">2</text></g>
+                <g class="court-zone" role="button" tabindex="0" aria-label="Top of key" data-zone="Top of key"><circle cx="160" cy="75" r="13" /><text x="160" y="79">3</text></g>
+                <g class="court-zone" role="button" tabindex="0" aria-label="Right wing" data-zone="Right wing"><circle cx="240" cy="92" r="13" /><text x="240" y="96">4</text></g>
+                <g class="court-zone" role="button" tabindex="0" aria-label="Right corner" data-zone="Right corner"><circle cx="287" cy="68" r="13" /><text x="287" y="72">5</text></g>
+                <g class="court-zone" role="button" tabindex="0" aria-label="Paint" data-zone="Paint"><circle cx="160" cy="155" r="13" /><text x="160" y="159">6</text></g>
+              </svg>
+              <p id="selectedZoneText" class="form-hint" aria-live="polite">Select a zone to get started.</p>
+              <div class="form-actions">
+                <button class="primary-btn" id="chartMadeBtn" type="button" disabled>Made</button>
+                <button class="ghost-btn" id="chartMissedBtn" type="button" disabled>Missed</button>
+              </div>
+            </article>
+            <article class="card">
+              <div class="card-head">
+                <h4>Shot breakdown</h4>
+                <span class="pill">By category</span>
+              </div>
+              <ul class="shot-breakdown" id="shotBreakdown"></ul>
+            </article>
+            <article class="card wide-card">
+              <div class="card-head">
+                <div>
+                  <h4>Progress over time</h4>
+                  <p class="card-subtitle">Shooting percentage by practice session.</p>
+                </div>
+                <div class="summary-switch" role="group" aria-label="Summary period">
+                  <button type="button" class="selected" data-period="week">Week</button>
+                  <button type="button" data-period="month">Month</button>
+                </div>
+              </div>
+              <div class="trend-chart-wrap">
+                <svg id="progressTrendChart" class="trend-chart" viewBox="0 0 640 190" role="img" aria-label="Shooting percentage history"></svg>
+              </div>
+              <div class="period-summary" aria-live="polite">
+                <div><strong id="periodSessions">0</strong><span>sessions</span></div>
+                <div><strong id="periodMinutes">0</strong><span>minutes</span></div>
+                <div><strong id="periodAttempts">0</strong><span>shot attempts</span></div>
+              </div>
+              <p id="trendEmptyState" class="empty-state">Your dated session trend will appear here after you log a workout.</p>
+              <div class="session-history-head">
+                <h5>Recent sessions</h5>
+                <span id="sessionHistoryCount" class="pill">0 sessions</span>
+              </div>
+              <div id="sessionHistory" class="session-history" aria-live="polite"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="view-coach" class="view">
+          <div class="section-grid">
+            <article class="card">
+              <div class="card-head">
+                <h4>Drill library</h4>
+                <span class="pill">Skill focus</span>
+              </div>
+              <div class="drill-list">
+                <div class="drill-item">
+                  <h5>Shot maker series</h5>
+                  <p>10 makes from 5 spots, 2 dribbles max, reset after each miss.</p>
+                </div>
+                <div class="drill-item">
+                  <h5>Defensive closeouts</h5>
+                  <p>3-step sprint, controlled stop, quick hand contest, then retreat to the cone.</p>
+                </div>
+                <div class="drill-item">
+                  <h5>Pick-and-roll reads</h5>
+                  <p>Work on rejects, slip timing, and making the second decision after the screen.</p>
+                </div>
+              </div>
+            </article>
+
+            <article class="card">
+              <div class="card-head">
+                <h4>Training plan</h4>
+                <span class="pill accent">This week</span>
+              </div>
+              <ul class="plan-list">
+                <li><span>Mon</span><strong>Footwork + spot shooting</strong></li>
+                <li><span>Tue</span><strong>Ball handling + attack moves</strong></li>
+                <li><span>Wed</span><strong>Defensive recovery + closeouts</strong></li>
+                <li><span>Thu</span><strong>Pick-and-roll reads</strong></li>
+              </ul>
+            </article>
+          </div>
+          <div class="section-grid planner-grid">
+            <article class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Player profile and goals</h4>
+                  <p class="card-subtitle">Used to adapt local training suggestions.</p>
+                </div>
+              </div>
+              <form id="profileForm" class="input-form">
+                <div class="form-grid">
+                  <label>Name<input id="profileName" maxlength="40" placeholder="Your name" /></label>
+                  <label>Position
+                    <select id="profilePosition"><option>Guard</option><option>Forward</option><option>Center</option><option>All positions</option></select>
+                  </label>
+                  <label>Dominant hand
+                    <select id="profileHand"><option>Right</option><option>Left</option><option>Both</option></select>
+                  </label>
+                  <label>Experience
+                    <select id="profileExperience"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select>
+                  </label>
+                  <label>Age group
+                    <select id="profileAgeGroup"><option value="prefer-not">Prefer not to say</option><option value="under13">Under 13</option><option value="teen">13–17</option><option value="adult">Adult</option></select>
+                  </label>
+                  <label>Equipment
+                    <select id="profileEquipment"><option value="ball-hoop">Ball and hoop</option><option value="ball">Ball only</option><option value="cones">Ball and cones</option><option value="bodyweight">No equipment</option></select>
+                  </label>
+                  <label>Training location
+                    <select id="profileLocation"><option value="court">Court</option><option value="driveway">Driveway</option><option value="indoors">Indoors</option><option value="anywhere">Anywhere</option></select>
+                  </label>
+                  <label>Primary goal
+                    <select id="profileGoal"><option value="shooting">Improve shooting</option><option value="handling">Improve ball handling</option><option value="finishing">Improve finishing</option><option value="defense">Improve defense</option><option value="iq">Improve game IQ</option></select>
+                  </label>
+                  <label>Weekly session target
+                    <input id="weeklyGoalInput" type="number" min="1" max="14" value="3" />
+                  </label>
+                  <label>Target shot percentage
+                    <input id="targetPctInput" type="number" min="1" max="100" value="70" />
+                  </label>
+                </div>
+                <fieldset class="skill-rating-fieldset">
+                  <legend>Skill self-ratings <span>(your estimate, 1–10)</span></legend>
+                  <div class="skill-rating-grid">
+                    <label>Shooting<input type="range" id="ratingShooting" min="1" max="10" value="5" /></label>
+                    <label>Ball handling<input type="range" id="ratingHandling" min="1" max="10" value="5" /></label>
+                    <label>Finishing<input type="range" id="ratingFinishing" min="1" max="10" value="5" /></label>
+                    <label>Defense<input type="range" id="ratingDefense" min="1" max="10" value="5" /></label>
+                    <label>Basketball IQ<input type="range" id="ratingIq" min="1" max="10" value="5" /></label>
+                  </div>
+                </fieldset>
+                <button class="primary-btn" type="submit">Save profile</button>
+                <p id="profileStatus" class="form-hint" aria-live="polite"></p>
+              </form>
+            </article>
+            <article class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Build a training session</h4>
+                  <p class="card-subtitle">Every plan includes warm-up, rest, and cooldown.</p>
+                </div>
+              </div>
+              <form id="plannerForm" class="input-form">
+                <div class="form-grid">
+                  <label>Session length
+                    <select id="planDuration"><option value="15">15 minutes</option><option value="30" selected>30 minutes</option><option value="45">45 minutes</option><option value="60">60 minutes</option></select>
+                  </label>
+                  <label>Focus
+                    <select id="planFocus"><option value="balanced">Balanced skills</option><option value="shooting">Shooting</option><option value="handling">Ball handling</option><option value="finishing">Finishing</option><option value="defense">Defense</option><option value="iq">Basketball IQ</option></select>
+                  </label>
+                </div>
+                <button class="primary-btn" type="submit">Create my plan</button>
+              </form>
+              <div id="generatedPlan" class="generated-plan"></div>
+              <div id="workoutPlayer" class="workout-player" hidden>
+                <p class="eyebrow subtle">Workout player</p>
+                <h5 id="playerBlockTitle"></h5>
+                <p id="playerBlockDescription" class="form-hint"></p>
+                <div class="player-timer" id="playerTimer">00:00</div>
+                <div class="form-actions">
+                  <button class="primary-btn" id="playerStartPauseBtn" type="button">Start</button>
+                  <button class="secondary-btn" id="playerSkipBtn" type="button">Skip</button>
+                  <button class="ghost-btn" id="playerCompleteBtn" type="button">Complete workout</button>
+                </div>
+                <p id="playerStatus" class="form-hint" aria-live="polite"></p>
+              </div>
+              <h5 class="session-history-head">Completed training</h5>
+              <div id="completedWorkoutHistory" class="session-history"></div>
+            </article>
+            <article class="card wide-card">
+              <div class="card-head">
+                <div>
+                  <h4>Your personal coach</h4>
+                  <p class="card-subtitle">Transparent suggestions based only on your saved practice data.</p>
+                </div>
+                <span class="pill accent">On-device rules</span>
+              </div>
+              <div id="coachRecommendations" class="recommendation-list"></div>
+              <p class="safety-note">Keep movements controlled, use a safe playing area, and stop if you feel pain. Include rest days and adjust effort to your age and experience.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="view-iq" class="view">
+          <div class="section-grid">
+            <article class="card">
+              <div class="card-head">
+                <h4>Game IQ concepts</h4>
+                <span class="pill">Decision making</span>
+              </div>
+              <div class="lesson-box">
+                <h5>Spacing</h5>
+                <p>Stay on the proper side of the ball, create easy passing angles, and avoid crowding the lane when your teammate is driving downhill.</p>
+              </div>
+              <div class="lesson-box">
+                <h5>Pick-and-roll decisions</h5>
+                <p>Read the defender’s hip, the screener’s roll timing, and whether the best action is a pass, a handoff, or a dribble attack.</p>
+              </div>
+              <div class="lesson-box">
+                <h5>Defense</h5>
+                <p>Keep the ball in front, force the ball to the sideline when possible, and recover without chasing on a bad closeout.</p>
+              </div>
+            </article>
+
+            <article class="card">
+              <div class="card-head">
+                <h4>Quick strategy cues</h4>
+                <span class="pill success">Memory prompt</span>
+              </div>
+              <ul class="strategy-list">
+                <li>When a teammate takes a defender deep, attack the opposite lane.</li>
+                <li>Never stand still on offense without a reason to move.</li>
+                <li>Use your eyes to make the right pass before the defender loads up.</li>
+                <li>Early help should be short and recoverable, not lazy.</li>
+              </ul>
+            </article>
+          </div>
+          <div class="section-grid strategy-tools-grid">
+            <article class="card strategy-board-card">
+              <div class="card-head">
+                <div>
+                  <h4>Strategy board</h4>
+                  <p class="card-subtitle">Select a setup to see player spacing and the main read.</p>
+                </div>
+                <label class="compact-select-label" for="strategyPlaySelect">Play</label>
+                <select id="strategyPlaySelect" class="compact-select">
+                  <option value="five-out">Five-out spacing</option>
+                  <option value="pick-roll">Pick-and-roll</option>
+                  <option value="help-defense">Help defense</option>
+                  <option value="closeout">Closeout rotation</option>
+                </select>
+              </div>
+              <div class="strategy-court-wrap">
+                <svg class="strategy-court" viewBox="0 0 320 360" role="img" aria-labelledby="strategyBoardTitle strategyBoardDescription">
+                  <title id="strategyBoardTitle">Five-out spacing board</title>
+                  <desc id="strategyBoardDescription">Offensive players are shown in lime and defenders in muted red.</desc>
+                  <rect class="court-floor" x="8" y="8" width="304" height="344" rx="10" />
+                  <path class="court-line" d="M8 38h304M105 352V205a55 55 0 0 1 110 0v147M130 352V215a30 30 0 0 1 60 0v137M142 38a18 18 0 1 0 36 0" />
+                  <path class="court-line" d="M35 38a125 125 0 0 0 250 0" />
+                  <circle class="court-hoop" cx="160" cy="40" r="8" />
+                  <g id="strategyBoardMarkers"></g>
+                </svg>
+              </div>
+              <div class="strategy-board-legend">
+                <span><i class="strategy-marker offense" aria-hidden="true"></i>Offense</span>
+                <span><i class="strategy-marker defense" aria-hidden="true"></i>Defense</span>
+                <span><i class="strategy-marker ball" aria-hidden="true"></i>Ball</span>
+              </div>
+              <div class="strategy-readout" aria-live="polite">
+                <h5 id="strategyReadTitle">Five-out spacing</h5>
+                <p id="strategyReadText">Keep the lane open and move the ball to shift the defense. Cut only when a teammate can see you.</p>
+              </div>
+            </article>
+            <article class="card strategy-advisor-card">
+              <div class="card-head">
+                <div>
+                  <h4>Ask the strategy coach</h4>
+                  <p class="card-subtitle">Describe a game problem and get practical next steps.</p>
+                </div>
+                <span class="pill accent">On-device guide</span>
+              </div>
+              <form id="strategyAdviceForm" class="input-form">
+                <div class="form-grid">
+                  <label>Focus
+                    <select id="strategyAdviceFocus">
+                      <option value="offense">Offense</option>
+                      <option value="defense">Defense</option>
+                    </select>
+                  </label>
+                  <label>Your situation
+                    <textarea id="strategyProblemInput" rows="4" maxlength="500" placeholder="Example: I get beaten when a player drives to the basket." required></textarea>
+                  </label>
+                </div>
+                <button class="primary-btn" type="submit">Get strategy</button>
+              </form>
+              <p class="strategy-ai-note">This uses transparent, local basketball guidance rules. It is not connected to an AI service and is not a substitute for a coach.</p>
+              <div id="strategyAdviceResult" class="strategy-advice-result" aria-live="polite" hidden></div>
+            </article>
+          </div>
+          <article class="card iq-simulator">
+            <div class="card-head">
+              <div>
+                <h4>Game situation simulator</h4>
+                <p class="card-subtitle">Choose a read, then review the reasoning.</p>
+              </div>
+              <label class="compact-select-label" for="iqLevel">Level</label>
+              <select id="iqLevel" class="compact-select"><option value="auto">Auto level</option><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select>
+            </div>
+            <div id="iqScenario" class="iq-scenario"></div>
+            <p id="iqFeedback" class="iq-feedback" aria-live="polite"></p>
+            <div class="form-actions">
+              <button class="primary-btn" id="nextIqBtn" type="button">Next situation</button>
+              <span id="iqScore" class="pill">0 correct</span>
+              <span id="iqLessonCount" class="pill">0 completed</span>
+            </div>
+          </article>
+        </section>
+
+        <section id="view-academy" class="view">
+          <article class="card academy-quiz-card">
+            <div class="card-head">
+              <div>
+                <h4>Find your play style</h4>
+                <p class="card-subtitle">Answer a few quick questions to get a suggested role and player styles to explore.</p>
+              </div>
+              <span class="pill accent">Play-style guide</span>
+            </div>
+            <form id="academyQuizForm" class="academy-quiz-form">
+              <div class="academy-quiz-grid">
+                <label>What do you enjoy most?
+                  <select name="enjoy" required>
+                    <option value="shooter">Making shots and moving without the ball</option>
+                    <option value="playmaker">Creating chances and finding teammates</option>
+                    <option value="attacker">Driving, changing pace, and finishing</option>
+                    <option value="versatile">Doing a bit of everything on the wing</option>
+                    <option value="big">Rebounding, screening, and playing near the rim</option>
+                  </select>
+                </label>
+                <label>What is a strength you want to build?
+                  <select name="strength" required>
+                    <option value="shooter">Reliable shooting and footwork</option>
+                    <option value="playmaker">Ball handling and court vision</option>
+                    <option value="attacker">Speed, balance, and finishing</option>
+                    <option value="versatile">Defense and versatile scoring</option>
+                    <option value="big">Rebounding, passing, and interior play</option>
+                  </select>
+                </label>
+                <label>Which play sounds most like you?
+                  <select name="play" required>
+                    <option value="shooter">Finding space for a catch-and-shoot</option>
+                    <option value="playmaker">Reading a screen and making the right pass</option>
+                    <option value="attacker">Attacking an open lane under control</option>
+                    <option value="versatile">Guarding different players and taking open shots</option>
+                    <option value="big">Setting a screen and helping secure the rebound</option>
+                  </select>
+                </label>
+              </div>
+              <button class="primary-btn" type="submit">Show my play-style matches</button>
+            </form>
+            <p class="academy-quiz-note">This is a practice-style suggestion, not a fixed position assessment. Your best role also depends on your team, coach, and skills.</p>
+            <div id="academyQuizResult" class="academy-quiz-result" aria-live="polite" hidden></div>
+          </article>
+          <div class="academy-grid">
+            <article class="player-card" data-academy-id="curry">
+              <div class="player-top">
+                <div class="player-avatar curry">C</div>
+                <div>
+                  <h4>Stephen Curry</h4>
+                  <p>Guard · Shooting and off-ball movement</p>
+                </div>
+              </div>
+              <p>Curry changes the geometry of the floor with shooting gravity, quick passes, and movement without the ball. His drills emphasize footwork, catch-and-shoot timing, and spacing discipline.</p>
+              <div class="academy-details">
+                <p><strong>Practice:</strong> Start close to the rim, make five balanced form shots, then move one step back after each set.</p>
+                <p><strong>Common mistake:</strong> drifting sideways or rushing the feet before the pass arrives.</p>
+                <p><strong>Level / time:</strong> Beginner to advanced · 12 minutes</p>
+                <p><strong>Measure:</strong> record makes out of 25 shots from five marked spots.</p>
+              </div>
+              <div class="academy-actions"><button class="tiny-btn" data-view="coach">Practice his drills</button><button class="secondary-btn" type="button" data-academy-complete>Log lesson practice</button></div>
+            </article>
+
+            <article class="player-card" data-academy-id="kyrie">
+              <div class="player-top">
+                <div class="player-avatar kyrie">K</div>
+                <div>
+                  <h4>Kyrie Irving</h4>
+                  <p>Point guard · Handles, creativity, and control</p>
+                </div>
+              </div>
+              <p>Kyrie thrives in tight spaces and uses hesitation moves and body control to create openings. Work on dribble combinations, change of pace, and finishing through contact.</p>
+              <div class="academy-details">
+                <p><strong>Practice:</strong> Perform a controlled hesitation into a change of direction, then finish with either hand.</p>
+                <p><strong>Common mistake:</strong> over-dribbling or changing direction without protecting the ball.</p>
+                <p><strong>Level / time:</strong> Intermediate · 10 minutes</p>
+                <p><strong>Measure:</strong> count clean finishes from 10 attempts on each side.</p>
+              </div>
+              <div class="academy-actions"><button class="tiny-btn" data-view="coach">Practice his drills</button><button class="secondary-btn" type="button" data-academy-complete>Log lesson practice</button></div>
+            </article>
+
+            <article class="player-card" data-academy-id="luka">
+              <div class="player-top">
+                <div class="player-avatar luka">L</div>
+                <div>
+                  <h4>Luka Dončić</h4>
+                  <p>Guard · Vision, playmaking, and pace</p>
+                </div>
+              </div>
+              <p>Luka sees the floor at a different speed, creating advantages with passing angles and tempo changes. His style requires patience, attention to weak-side defenders, and confident decision-making.</p>
+              <div class="academy-details">
+                <p><strong>Practice:</strong> Use a chair or cone as a screen; pause, read the imagined help defender, and choose a pass or change of pace.</p>
+                <p><strong>Common mistake:</strong> deciding before checking where the help defender is positioned.</p>
+                <p><strong>Level / time:</strong> Intermediate to advanced · 12 minutes</p>
+                <p><strong>Measure:</strong> track correct reads from 10 imagined pick-and-roll reps.</p>
+              </div>
+              <div class="academy-actions"><button class="tiny-btn" data-view="coach">Practice his drills</button><button class="secondary-btn" type="button" data-academy-complete>Log lesson practice</button></div>
+            </article>
+
+            <article class="player-card" data-academy-id="shai">
+              <div class="player-top">
+                <div class="player-avatar shai">S</div>
+                <div>
+                  <h4>Shai Gilgeous-Alexander</h4>
+                  <p>Guard · Efficiency, downhill attacks, and balance</p>
+                </div>
+              </div>
+              <p>Shai blends smooth downhill speed with efficient finishing and controlled spacing. Drill your first step, second-step decisions, and one-dribble pull-ups off the catch or dribble.</p>
+              <div class="academy-details">
+                <p><strong>Practice:</strong> Attack from the wing at half speed, vary the gather, then finish balanced without forcing contact.</p>
+                <p><strong>Common mistake:</strong> taking extra steps or leaning past a balanced finish.</p>
+                <p><strong>Level / time:</strong> Beginner to advanced · 10 minutes</p>
+                <p><strong>Measure:</strong> compare controlled makes out of 10 from both sides.</p>
+              </div>
+              <div class="academy-actions"><button class="tiny-btn" data-view="coach">Practice his drills</button><button class="secondary-btn" type="button" data-academy-complete>Log lesson practice</button></div>
+            </article>
+
+            <article class="player-card" data-academy-id="klay">
+              <div class="player-top">
+                <div class="player-avatar klay">K</div>
+                <div>
+                  <h4>Klay Thompson</h4>
+                  <p>Shooting guard · Shooting and conditioning</p>
+                </div>
+              </div>
+              <p>Study a shooting-guard approach built on balanced footwork, quick preparation, off-ball movement, and staying ready through a long possession.</p>
+              <div class="academy-details">
+                <p><strong>Practice:</strong> From five spots, move into a balanced catch-and-shoot stance and take five comfortable shots at each spot.</p>
+                <p><strong>Common mistake:</strong> rushing the release or letting the feet drift sideways as you get tired.</p>
+                <p><strong>Level / time:</strong> Beginner to advanced · 12 minutes</p>
+                <p><strong>Measure:</strong> record makes out of 25 and note whether each shot started balanced.</p>
+              </div>
+              <div class="academy-actions"><button class="tiny-btn" data-view="coach">Practice his drills</button><button class="secondary-btn" type="button" data-academy-complete>Log lesson practice</button></div>
+            </article>
+
+            <article class="player-card" data-academy-id="tatum">
+              <div class="player-top">
+                <div class="player-avatar tatum">T</div>
+                <div>
+                  <h4>Jayson Tatum</h4>
+                  <p>Forward · Two-way wing skills</p>
+                </div>
+              </div>
+              <p>Build transferable wing habits with controlled shot preparation, strong closeouts, and reading whether to shoot, drive, or move the ball.</p>
+              <div class="academy-details">
+                <p><strong>Practice:</strong> Start on the wing, catch in balance, then choose a comfortable shot, one-dribble attack, or extra pass.</p>
+                <p><strong>Common mistake:</strong> deciding on the move before checking the defender and open space.</p>
+                <p><strong>Level / time:</strong> Intermediate · 12 minutes</p>
+                <p><strong>Measure:</strong> track good decisions out of 10 reps, not just made shots.</p>
+              </div>
+              <div class="academy-actions"><button class="tiny-btn" data-view="coach">Practice his drills</button><button class="secondary-btn" type="button" data-academy-complete>Log lesson practice</button></div>
+            </article>
+
+            <article class="player-card" data-academy-id="giannis">
+              <div class="player-top">
+                <div class="player-avatar giannis">G</div>
+                <div>
+                  <h4>Giannis Antetokounmpo</h4>
+                  <p>Forward · Rim pressure and transition</p>
+                </div>
+              </div>
+              <p>Practice a forward’s ability to run the floor, attack open space under control, and use balanced gathers to finish without forcing contact.</p>
+              <div class="academy-details">
+                <p><strong>Practice:</strong> From the wing, take two controlled dribbles into open space and finish with a balanced gather; alternate sides.</p>
+                <p><strong>Common mistake:</strong> taking too many steps or charging into a crowded lane.</p>
+                <p><strong>Level / time:</strong> Beginner to advanced · 10 minutes</p>
+                <p><strong>Measure:</strong> count controlled finishes out of 10 on each side.</p>
+              </div>
+              <div class="academy-actions"><button class="tiny-btn" data-view="coach">Practice his drills</button><button class="secondary-btn" type="button" data-academy-complete>Log lesson practice</button></div>
+            </article>
+
+            <article class="player-card" data-academy-id="jokic">
+              <div class="player-top">
+                <div class="player-avatar jokic">J</div>
+                <div>
+                  <h4>Nikola Jokić</h4>
+                  <p>Center · Passing, screening, and touch</p>
+                </div>
+              </div>
+              <p>Explore center skills through patient decisions, useful screens, soft touch near the basket, and passing to teammates when help defenders commit.</p>
+              <div class="academy-details">
+                <p><strong>Practice:</strong> Set a stationary screen for a partner, pivot to a passing target, and finish with a close-range touch shot.</p>
+                <p><strong>Common mistake:</strong> screening while moving or forcing a shot after the defense collapses.</p>
+                <p><strong>Level / time:</strong> Beginner to intermediate · 10 minutes</p>
+                <p><strong>Measure:</strong> log correct pass-or-finish choices across 10 repetitions.</p>
+              </div>
+              <div class="academy-actions"><button class="tiny-btn" data-view="coach">Practice his drills</button><button class="secondary-btn" type="button" data-academy-complete>Log lesson practice</button></div>
+            </article>
+          </div>
+          <p id="academyStatus" class="form-hint" aria-live="polite"></p>
+        </section>
+
+        <section id="view-settings" class="view">
+          <div class="section-grid settings-grid">
+            <article class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Appearance</h4>
+                  <p class="card-subtitle">Choose a light or dark color theme for the whole app.</p>
+                </div>
+              </div>
+              <div class="settings-row">
+                <span id="themePreferenceLabel">Current theme</span>
+                <button class="secondary-btn" type="button" data-theme-toggle>Switch theme</button>
+              </div>
+            </article>
+            <article class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Player profile and goals</h4>
+                  <p class="card-subtitle">Update your position, experience, training preferences, and goals.</p>
+                </div>
+              </div>
+              <button class="secondary-btn" type="button" data-view="coach">Open profile settings</button>
+            </article>
+            <article class="card">
+              <div class="card-head">
+                <div>
+                  <h4>Your data</h4>
+                  <p class="card-subtitle">Export a backup or import saved HoopIQ data. Importing asks before replacing current progress.</p>
+                </div>
+              </div>
+              <div class="data-actions">
+                <button type="button" class="secondary-btn" id="exportDataBtn">Export my data</button>
+                <button type="button" class="ghost-btn" id="importDataBtn">Import data</button>
+                <input type="file" id="importDataInput" accept="application/json,.json" hidden />
+              </div>
+              <button type="button" class="ghost-btn settings-reset-btn" id="settingsResetProgressBtn">Reset progress</button>
+              <p id="dataStatus" class="form-hint" aria-live="polite"></p>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
